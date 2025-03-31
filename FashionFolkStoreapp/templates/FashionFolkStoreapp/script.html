@@ -1,0 +1,106 @@
+// Fetch My api pet
+        // Fetch Pet Fashion (Real API)
+        document.getElementById('fetchDataButton').addEventListener('click', function() {
+            productsContainer.innerHTML = '<p>Loading...</p>'; // Show loading message
+
+            // Fetch data from the real API
+            fetch('http://54.88.94.5:8000/api/fashions/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        productsContainer.innerHTML = '<p>No products available.</p>';
+                        return;
+                    }
+
+                    productsContainer.innerHTML = ''; // Clear previous content
+                    data.forEach(item => {
+                        const productDiv = document.createElement('div');
+                        productDiv.classList.add('product');
+                        productDiv.innerHTML = `
+                            <img src="${item.image_url}" alt="${item.name}">
+                            <p>${item.description}</p>
+                            <p>Category: ${item.pet_category}</p>
+                            <p><strong>Price:</strong> $${item.price}</p>
+                        `;
+                        productsContainer.appendChild(productDiv);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    productsContainer.innerHTML = '<p>There was an error loading the products. Please try again later.</p>';
+                });
+        });
+            // Fetch Pet Fashion (Real API)
+    document.getElementById('fetchDataButton').addEventListener('click', function() {
+        fetchProducts();
+    });
+
+
+// Function to fetch products
+    function fetchProducts() {
+        productsContainer.innerHTML = '<p>Loading...</p>'; // Show loading message
+
+        fetch('http://54.88.94.5:8000/api/fashions/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.length === 0) {
+                    productsContainer.innerHTML = '<p>No products available.</p>';
+                    return;
+                }
+
+                productsContainer.innerHTML = ''; // Clear previous content
+                data.forEach(item => {
+                    const productDiv = document.createElement('div');
+                    productDiv.classList.add('product');
+                    productDiv.innerHTML = `
+                        <img src="${item.image_url}" alt="${item.name}">
+                        <p>${item.description}</p>
+                        <p>Category: ${item.pet_category}</p>
+                        <p><strong>Price:</strong> $${item.price}</p>
+                        <button onclick="editProduct(${item.id}, '${item.name}', '${item.description}', '${item.pet_category}', ${item.price})">Edit</button>
+                    `;
+                    productsContainer.appendChild(productDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                productsContainer.innerHTML = '<p>There was an error loading the products. Please try again later.</p>';
+            });
+    }
+
+
+
+
+      // Function to edit a product
+    function editProduct(id, name, description, category, price,imageUrl) {
+        const newName = prompt("Enter new product name:", name);
+        const newDescription = prompt("Enter new description:", description);
+        const newCategory = prompt("Enter new category:", category);
+        const newPrice = prompt("Enter new price:", price);
+        const newImageUrl = prompt("Enter image URL:", imageUrl);
+
+        if (newName && newDescription && newCategory && newPrice && newImageUrl) {
+            fetch(`http://54.88.94.5:8000/api/fashions/${id}/`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: newName,
+                    description: newDescription,
+                    price: parseFloat(newPrice),
+                    //category: newCategory
+                    pet_category: newCategory, // Include if required by API
+                    image_url: newImageUrl // Required field
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("Product updated successfully!");
+                fetchProducts(); // Refresh product list
+            })
+            .catch(error => console.error('Error updating product:', error));
+        }
+    }
+
+

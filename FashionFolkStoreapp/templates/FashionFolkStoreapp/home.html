@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Fashion Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+         body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #8db6bb;
+            text-align: center;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fa2f1f;
+            padding: 15px 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-links li {
+            display: inline;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+        .hero {
+            padding: 50px;
+            background: url('https://source.unsplash.com/1600x900/?pet,fashion') center/cover;
+            color: white;
+        }
+        .cta-button {
+            background: #ff1d00;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .cta-button:hover {
+            background: #e85b50;
+        }
+        .fashion-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+
+
+.product {
+            display: inline-block;
+            width: 200px;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        .product img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .fashion-item {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 250px;
+        }
+        .fashion-item img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .fashion-item h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        .fashion-item p {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">🐾 Fashion Folk Store</div>
+            <ul class="nav-links">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Shop</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1 id="heading">Dress Your Pets in Style!</h1>
+        <h2>Trendy & Comfortable Fashion for You and for your Furry Friends</h2>
+        <div id="products-container" class="fashion-gallery"></div>
+        <h1>Fashion Products</h1>
+        <button id="exploreButton" class="cta-button">Men's Fashion</button>
+        <button id="fetchDataButton" class="cta-button">🐾 Pet Fashion</button>
+         <div id="productsContainer"></div>
+        <button id="fetchPetinfo" class="cta-button">For more Pet info Click Me !</button>
+
+    </section>
+
+    <script>
+        function showHeading() {
+            document.getElementById('heading').style.display = 'block';
+        }
+        const productsContainer = document.getElementById('products-container');
+
+        // Fetch Men's Fashion (Fake API)
+        document.getElementById('exploreButton').addEventListener('click', function() {
+            fetch('https://fakestoreapi.com/products')
+                .then(response => response.json())
+                .then(data => {
+                    productsContainer.innerHTML = '';
+                    data.slice(0, 6).forEach(product => {
+                        const productDiv = document.createElement('div');
+                        productDiv.classList.add('product');
+                        productDiv.innerHTML = `
+                            <img src="${product.image}" alt="${product.title}">
+                            <h3 style="color:red">${product.title}</h3>
+                            <p>$${product.price}</p>
+                        `;
+                        productsContainer.appendChild(productDiv);
+                    });
+                })
+                .catch(error => console.log('Error fetching data:', error));
+        });
+
+        // Fetch Pet Fashion (Real API)
+        document.getElementById('fetchDataButton').addEventListener('click', function() {
+            fetchProducts();
+        });
+
+        // Fetch products from the real API
+        function fetchProducts() {
+            productsContainer.innerHTML = '<p>Loading...</p>'; // Show loading message
+            fetch('http://54.88.94.5:8000/api/fashions/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        productsContainer.innerHTML = '<p>No products available.</p>';
+                        return;
+                    }
+
+                    productsContainer.innerHTML = ''; // Clear previous content
+                    data.forEach(item => {
+                        const productDiv = document.createElement('div');
+                        productDiv.classList.add('product');
+                        productDiv.innerHTML = `
+                            <img src="${item.image_url}" alt="${item.name}">
+                            <p>${item.name}</p>
+                            <p>${item.description}</p>
+                            <p>Category: ${item.pet_category}</p>
+                            <p><strong>Price:</strong> $${item.price}</p>
+                            <button class="editButton" data-id="${item.id}">Edit</button>
+                            <button class="deleteButton" data-id="${item.id}">Delete</button>
+                        `;
+                        productsContainer.appendChild(productDiv);
+                    });
+
+                    // Add event listeners for Edit and Delete buttons
+                    document.querySelectorAll('.editButton').forEach(button => {
+                        button.addEventListener('click', function(event) {
+                            const productId = event.target.getAttribute('data-id');
+                            editProduct(productId);
+                        });
+                    });
+
+                    document.querySelectorAll('.deleteButton').forEach(button => {
+                        button.addEventListener('click', function(event) {
+                            const productId = event.target.getAttribute('data-id');
+                            deleteProduct(productId);
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    productsContainer.innerHTML = '<p>There was an error loading the products. Please try again later.</p>';
+                });
+        }
+
+        // Function to edit a product
+        function editProduct(id) {
+            const productDiv = document.querySelector(`[data-id="${id}"]`).closest('.product');
+            const name = productDiv.querySelector('p:nth-of-type(1)').textContent;
+            const description = productDiv.querySelector('p:nth-of-type(2)').textContent;
+            const category = productDiv.querySelector('p:nth-of-type(3)').textContent.split(": ")[1];
+            const price = productDiv.querySelector('p:nth-of-type(4)').textContent.split("$")[1];
+            const imageUrl = productDiv.querySelector('img').src;
+
+            const newName = prompt("Enter new product name:", name);
+            const newDescription = prompt("Enter new description:", description);
+            const newCategory = prompt("Enter new category:", category);
+            const newPrice = prompt("Enter new price:", price);
+            const newImageUrl = prompt("Enter image URL:", imageUrl);
+
+            if (newName && newDescription && newCategory && newPrice && newImageUrl) {
+                fetch(`http://54.88.94.5:8000/api/fashions/${id}/`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: newName,
+                        description: newDescription,
+                        price: parseFloat(newPrice),
+                        pet_category: newCategory,
+                        image_url: newImageUrl
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert("Product updated successfully!");
+                    fetchProducts(); // Refresh product list
+                })
+                .catch(error => console.error('Error updating product:', error));
+            }
+        }
+
+        // Function to delete a product
+        function deleteProduct(id) {
+            const confirmDelete = confirm('Are you sure you want to delete this product?');
+            if (confirmDelete) {
+                fetch(`http://54.88.94.5:8000/api/fashions/${id}/`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Product deleted successfully');
+                        fetchProducts(); // Refresh product list after deletion
+                    } else {
+                        alert('Failed to delete the product');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting product:', error);
+                    alert('There was an error deleting the product. Please try again later.');
+                });
+            }
+        }
+        //const productsContainer = document.getElementById('products-container');
+
+        // Sneha's pet info API
+        document.getElementById('fetchPetinfo').addEventListener('click', function() {
+    fetch('http://35.173.214.218:8000/api/pets/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const productsContainer = document.getElementById('productsContainer');
+            if (!productsContainer) {
+                console.error("Error: 'productsContainer' element not found in the DOM.");
+                return;
+            }
+            productsContainer.innerHTML = ''; // Clear the container
+
+            // Loop through the pets and display their information
+            data.forEach(pet => {
+                const petDiv = document.createElement('div');
+                petDiv.classList.add('pet');
+                petDiv.innerHTML = `
+                    <h3>Name: ${pet.name}</h3>
+                    <p>Type: ${pet.pet_type}</p>
+                    <p>Breed: ${pet.breed}</p>
+                    <p>Age: ${pet.age}</p>
+                    <p>Description: ${pet.description}</p>
+                `;
+                productsContainer.appendChild(petDiv);
+            });
+        })
+        .catch(error => console.log('Error fetching data:', error));
+});
+
+    </script>
+</body>
+</html>
