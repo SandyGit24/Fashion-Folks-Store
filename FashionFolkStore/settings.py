@@ -80,11 +80,15 @@ WSGI_APPLICATION = 'FashionFolkStore.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
+#FashionFolkStore
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'FashionFolkStore',
+        'USER': 'admin',
+        'PASSWORD': 'Sammy&Sandy15',
+        'HOST': 'database-1.csjgmqo8kwy9.us-east-1.rds.amazonaws.com',
+        'PORT': '3306',
     }
 }
 
